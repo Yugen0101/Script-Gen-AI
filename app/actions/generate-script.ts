@@ -14,7 +14,10 @@ interface GenerateScriptParams {
 
 export async function generateScript({ platform, topic, tone, length, language }: GenerateScriptParams) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+        // Fresh API key generated on 2026-01-09
+        const key = 'AIzaSyDxWEyMiHcob4lpC0VPx2i9uJ9K-g2L65k'
+        const localGenAI = new GoogleGenerativeAI(key)
+        const model = localGenAI.getGenerativeModel({ model: 'gemini-1.5-flash' }, { apiVersion: 'v1' })
 
         const instructions = `You are an expert script writer. Your task is to generate a script in a strict JSON format.
         

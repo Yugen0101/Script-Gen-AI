@@ -1,11 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
 
 export default function GlobalHaptics() {
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
     const audioContextRef = useRef<AudioContext | null>(null)
 
     // Initialize Audio Context on first interaction

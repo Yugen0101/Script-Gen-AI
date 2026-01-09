@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowLeft, Loader2, ArrowRight } from 'lucide-react'
 import Logo from '@/components/Logo'
 
-export default function LoginPage() {
+function LoginContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const supabase = createClient()
@@ -67,7 +67,7 @@ export default function LoginPage() {
     if (!mounted) return null;
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 mesh-gradient bg-zinc-50 dark:bg-[#0B1120] text-zinc-900 dark:text-zinc-50 smooth-transition">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-50 dark:bg-[#0B1120] text-zinc-900 dark:text-zinc-50 smooth-transition">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -101,8 +101,8 @@ export default function LoginPage() {
                         <button
                             onClick={() => setIsLogin(true)}
                             className={`flex-1 py-2.5 text-sm font-medium rounded-lg smooth-transition ${isLogin
-                                    ? 'bg-white dark:bg-[#0B1120] text-blue-600 dark:text-blue-400 shadow-sm'
-                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-[#0B1120] text-blue-600 dark:text-blue-400 shadow-sm'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                         >
                             Log In
@@ -110,8 +110,8 @@ export default function LoginPage() {
                         <button
                             onClick={() => setIsLogin(false)}
                             className={`flex-1 py-2.5 text-sm font-medium rounded-lg smooth-transition ${!isLogin
-                                    ? 'bg-white dark:bg-[#0B1120] text-blue-600 dark:text-blue-400 shadow-sm'
-                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-[#0B1120] text-blue-600 dark:text-blue-400 shadow-sm'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                         >
                             Sign Up
@@ -168,5 +168,17 @@ export default function LoginPage() {
                 </div>
             </motion.div>
         </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#0B1120]">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     )
 }

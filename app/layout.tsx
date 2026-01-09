@@ -8,8 +8,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: 'Script Writer - AI Script Generator',
-    description: 'Generate professional scripts for YouTube, Instagram Reels, and LinkedIn with AI.',
+    title: 'ScriptGo - AI Script Generator',
+    description: 'Generate professional scripts for TikTok, YouTube, Reels, and LinkedIn with AI.',
     keywords: ['AI script generator', 'YouTube script', 'Instagram Reels', 'content creation', 'AI writer'],
 };
 

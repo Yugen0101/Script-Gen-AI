@@ -15,7 +15,7 @@ export default function HomePage() {
     }
 
     return (
-        <div className="min-h-screen mesh-gradient bg-zinc-50 dark:bg-[#0B1120] text-zinc-900 dark:text-zinc-50 smooth-transition">
+        <div className="min-h-screen bg-zinc-50 dark:bg-[#0B1120] text-zinc-900 dark:text-zinc-50 smooth-transition">
             {/* Hero Section */}
             <div className="container mx-auto px-4 pt-32 pb-20">
                 <motion.div
