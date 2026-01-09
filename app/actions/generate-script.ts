@@ -1,8 +1,10 @@
 'use server'
 
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import OpenAI from 'openai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY!
+})
 
 interface GenerateScriptParams {
     platform: string
@@ -14,13 +16,8 @@ interface GenerateScriptParams {
 
 export async function generateScript({ platform, topic, tone, length, language }: GenerateScriptParams) {
     try {
-        // Fresh API key generated on 2026-01-09
-        const key = 'AIzaSyDxWEyMiHcob4lpC0VPx2i9uJ9K-g2L65k'
-        const localGenAI = new GoogleGenerativeAI(key)
-        const model = localGenAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
-
         const instructions = `You are an expert script writer. Your task is to generate a script in a strict JSON format.
-        
+
 Returns valid JSON with this structure:
 {
   "hook": "The hook text here...",
@@ -44,13 +41,27 @@ Guidelines for Visual/Audio split:
 Make the content engaging, high-retention, and tailored to the platform. 
 ENSURE THE OUTPUT IS PURE VALID JSON ONLY. NO MARKDOWN BLOCK.`;
 
-        const result = await model.generateContent(instructions)
-        const response = await result.response
-        const text = response.text()
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an expert script writer. Always respond with valid JSON only, no markdown formatting."
+                },
+                {
+                    role: "user",
+                    content: instructions
+                }
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7,
+        })
+
+        const content = completion.choices[0]?.message?.content || '{}'
 
         return {
             success: true,
-            content: text,
+            content: content,
         }
     } catch (error: any) {
         console.error('Error generating script:', error)

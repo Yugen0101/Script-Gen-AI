@@ -6,7 +6,6 @@
   NODE_VERSION = "20"
   NEXT_PUBLIC_SUPABASE_URL = "https://iufkgqtastuwlequwwlw.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_1ES8INP2q5YHI4uJWIIYlw_zmq8_TzL"
-  GEMINI_API_KEY = "AIzaSyDxWEyMiHcob4lpC0VPx2i9uJ9K-g2L65k"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
