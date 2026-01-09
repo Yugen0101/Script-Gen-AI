@@ -1,0 +1,53 @@
+# ScriptGo - AI-Powered Script Generator
+
+A modern web application that generates professional video scripts and LinkedIn posts using AI.
+
+## Features
+
+- 🤖 AI-powered script generation using Google Gemini
+- 🎬 Support for YouTube and LinkedIn platforms
+- 🎨 Beautiful dark mode UI with glassmorphism
+- 🔐 Secure authentication with Supabase
+- 💾 Save and manage your scripts
+- ✨ Smooth animations and transitions
+- 📱 Fully responsive design
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, Tailwind CSS, Framer Motion
+- **Backend**: Supabase (Auth & Database)
+- **AI**: Google Gemini API
+- **Deployment**: Netlify
+
+## Getting Started
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Set up environment variables in `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+3. Run the Supabase schema:
+- Go to your Supabase project SQL Editor
+- Run the SQL from `supabase-schema.sql`
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000)
+
+## Deployment
+
+This app is configured for Netlify deployment. Make sure to set the environment variables in your Netlify dashboard.
+
+## License
+
+MIT

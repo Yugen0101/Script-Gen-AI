@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Royal Dark Theme Base */
+    --background: 222 47% 11%;
+    /* Dark Royal Blue Base */
+    --foreground: 210 40% 98%;
+
+    /* Electric Blue Primary */
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-zinc-50 dark:bg-[#0B1120] text-zinc-900 dark:text-zinc-50 transition-colors duration-300;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+
+  /* Global Button Style with Royal+Thunder Gradient */
+  .btn-royal {
+    @apply bg-royal-thunder hover:bg-royal-thunder-hover text-white font-semibold rounded-xl transition-all duration-300 transform active:scale-95 active:bg-blue-600 shadow-royal hover:shadow-royal-hover border border-white/10 backdrop-blur-sm relative overflow-hidden;
+  }
+
+  /* Shine effect on hover */
+  .btn-royal::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] transition-transform duration-700;
+  }
+
+  .btn-royal:hover::after {
+    @apply translate-x-[200%];
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-[#0f172a] border border-blue-500/10 shadow-lg shadow-blue-500/5;
+  }
+
+  .glass-hover {
+    @apply hover:border-blue-500/30 hover:shadow-blue-500/10 transition-all duration-300;
+  }
+
+  .neon-border {
+    @apply border border-blue-500/20 shadow-[0_0_15px_rgba(59, 130, 246, 0.1)];
+  }
+
+  .focus-neon {
+    @apply focus:border-blue-500/50 focus:shadow-[0_0_10px_rgba(59, 130, 246, 0.3)] focus:outline-none transition-all duration-300;
+  }
+
+  .gradient-text {
+    @apply text-white;
+    /* Removed gradient */
+  }
+
+  .smooth-transition {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Haptic active state for all clickable elements */
+  .haptic-tap:active {
+    @apply scale-95 duration-75;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-zinc-100 dark:bg-slate-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-300 dark:bg-slate-700/50 rounded-full hover:bg-blue-500/50 transition-colors;
+}
