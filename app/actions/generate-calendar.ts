@@ -96,13 +96,14 @@ export async function generateCalendarContent({ platform, topic, tone, language,
             
             CRITICAL LANGUAGE REQUIREMENT & ACCURACY:
             - If ${language} is English, the entire script must be in English.
-            - If ${language} is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST provide a script that is **EASY TO SPEAK** and **HUMAN UNDERSTANDABLE**. 
-            - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for the core structure and simple dialogue.
-            - **ENGLISH FOR COMPLEXITY (TANGLISH/KANGLISH style)**: For ANY word that is complex, formal, or has a specific technical meaning, **DO NOT** use the formal native word. Instead, use the **ENGLISH** word (written in English script). 
-            - **REQUIRED**: This hybrid approach (e.g., Tanglish/Hinglish) is MANDATORY to ensure the script sounds natural and modern for social media.
+            - If ${language} is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST generate a script that is **HYPER-CONVERSATIONAL**, **EASY TO SPEAK**, and **MODERN**.
+            - **THE "TALK TEST"**: It must sound like a social media creator, NOT a dictionary or a news reporter.
+            - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for basic sentence structure.
+            - **MANDATORY ENGLISH (TANGLISH/KANGLISH style)**: For ANY word that is technical, formal, or complicated, **YOU MUST** use the **ENGLISH** word (written in English script). 
+            - **NO FORMAL WORDS**: Avoid formal/literary native words. Use the common English equivalent instead.
+            - **GOAL**: The script must be "talkable" and follow the flow of how people naturally speak on social media today.
             - **EVERYTHING INSIDE JSON**: This applies to Hooks, Visual Directions, and Audio.
-            - **HUMAN TOUCH**: Write like a friend speaking to a friend. Focus on natural flow and "speaking" rather than "reading".
-            - **FACTUAL ACCURACY**: Ensure all information about the topic is 100% correct. Verified the origin, language, and facts carefully.
+            - **FACTUAL ACCURACY**: Ensure all information about the topic is 100% correct.
 
             Output ONLY valid JSON.`;
 
