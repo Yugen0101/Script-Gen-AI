@@ -1,15 +1,16 @@
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# AI Configuration (The app currently uses OpenAI)
-OPENAI_API_KEY=your-openai-key
-
-# Optional: Google Gemini Configuration (Mentioned in README)
+# AI Configuration (Google Gemini)
 GEMINI_API_KEY=your-gemini-key
 
 # Email Service (Resend)
 RESEND_API_KEY=your-resend-api-key
 
-# Cron Job Security (Optional - for daily brief emails)
+# Application URL
+NEXT_PUBLIC_APP_URL=https://your-site.netlify.app
+
+# Cron Job Security (Optional)
 CRON_SECRET=your-random-secret-string

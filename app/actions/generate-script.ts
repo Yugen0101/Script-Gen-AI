@@ -3,6 +3,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { sendScriptReadyEmail } from '@/app/actions/email'
+import { after } from 'next/server'
 
 interface GenerateScriptParams {
     platform: string
@@ -147,11 +148,13 @@ Input Parameters:
 
 CRITICAL LANGUAGE REQUIREMENT:
 1. If the target language is English, the entire script must be in English.
-2. If the target language is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), use a natural, CONVERSATIONAL HYBRID approach (e.g., 'Tanglish' for Tamil, 'Mallish' for Malayalam, 'Kanglish' for Kannada, i.e., Native + English mixed). 
-   - **HUMAN TOUCH**: The script should feel like a friend writing for a friend. Use a natural speaking style that is easy to read aloud without causing stress or stuttering.
-   - **REQUIRED**: Always keep **Actor Names**, **Movie Titles**, **Technical Terms**, and **Industry Jargon** in English script (e.g., use 'Guyido', 'Life is Beautiful', 'AI' instead of their native script equivalents).
-   - Use the native script for the overall sentence structure and common words, but switch to English for any word that is complicated, formal, or hard to read in the native script.
-   - The final result should look like how people actually speak in a modern, casual setting (e.g., high-quality YouTube/Social Media style).
+2. If the target language is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST provide a script that is **EASY TO SPEAK** and **HUMAN UNDERSTANDABLE**. 
+   - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for the core structure and simple, everyday dialogue.
+   - **ENGLISH FOR COMPLEXITY (TANGLISH/KANGLISH style)**: For ANY word that is complex, formal, or has a specific technical meaning, **DO NOT** use the formal native word. Instead, use the **ENGLISH** word (written in English script). 
+   - **REQUIRED**: This hybrid approach (e.g., Tanglish for Tamil, Hinglish for Hindi) is MANDATORY to ensure the script sounds natural and modern, like how people actually talk on social media.
+   - **EVERYTHING INSIDE JSON**: This applies to Hooks, Visual Directions, Audio, and Captions.
+   - **HUMAN TOUCH**: Write like a friend speaking to a friend. If a sentence feels too formal in the native script, rewrite it to be casual, even if it means using more English words.
+   - **OUTPUT STYLE**: Focus on "speaking" rather than "reading". If a native word is hard to pronounce or sounds outdated, replace it with the English equivalent.
 
 FACTUAL ACCURACY MANDATE:
 - You are a professional researcher. Ensure all information provided is 100% accurate. 
@@ -173,25 +176,27 @@ ENSURE THE OUTPUT IS PURE VALID JSON ONLY. NO MARKDOWN BLOCK.`;
             content = content.split('```')[1].split('```')[0].trim();
         }
 
-        // Try to send email if user is authenticated
-        try {
-            const supabase = await createClient()
-            const { data: { user } } = await supabase.auth.getUser()
+        // Send email in the background after response is sent (Next.js 15+)
+        after(async () => {
+            try {
+                const supabase = await createClient()
+                const { data: { user } } = await supabase.auth.getUser()
 
-            if (user && user.email) {
-                let preview = "Check your script in the dashboard.";
-                let title = topic;
-                try {
-                    const jsonContent = JSON.parse(content);
-                    if (jsonContent.hook) preview = jsonContent.hook;
-                } catch (e) { }
+                if (user && user.email) {
+                    let preview = "Check your script in the dashboard.";
+                    let title = topic;
+                    try {
+                        const jsonContent = JSON.parse(content);
+                        if (jsonContent.hook) preview = jsonContent.hook;
+                    } catch (e) { }
 
-                console.log('--- SENDING SCRIPT EMAIL (Gemini) ---');
-                await sendScriptReadyEmail(user.email, title, preview, 'generated');
+                    console.log('--- SENDING SCRIPT EMAIL (Gemini) ---');
+                    await sendScriptReadyEmail(user.email, title, preview, 'generated');
+                }
+            } catch (emailError) {
+                console.error("Failed to send script ready email", emailError)
             }
-        } catch (emailError) {
-            console.error("Failed to send script ready email", emailError)
-        }
+        })
 
         return {
             success: true,

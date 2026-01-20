@@ -95,11 +95,14 @@ export async function generateCalendarContent({ platform, topic, tone, language,
             The entire script content MUST be in ${language}. 
             
             CRITICAL LANGUAGE REQUIREMENT & ACCURACY:
-            - If ${language} is NOT English, use a natural, CONVERSATIONAL HYBRID approach (e.g., 'Tanglish' for Tamil, 'Mallish' for Malayalam, 'Kanglish' for Kannada).
-            - **HUMAN TOUCH**: Write in a way that is modern, casual, and stress-free to read aloud. A friend writing for a friend.
-            - **NAMES & TITLES**: Keep all Actor Names, Movie Titles, and Technical Jargon in **English script**.
-            - **READABILITY**: Use English for any complicated or formal words that are hard to pronounce in the native script.
-            - **FACTUAL ACCURACY**: Ensure all information about the topic is 100% correct. verified the origin, language, and facts carefully. Do NOT provide misinformation.
+            - If ${language} is English, the entire script must be in English.
+            - If ${language} is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST provide a script that is **EASY TO SPEAK** and **HUMAN UNDERSTANDABLE**. 
+            - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for the core structure and simple dialogue.
+            - **ENGLISH FOR COMPLEXITY (TANGLISH/KANGLISH style)**: For ANY word that is complex, formal, or has a specific technical meaning, **DO NOT** use the formal native word. Instead, use the **ENGLISH** word (written in English script). 
+            - **REQUIRED**: This hybrid approach (e.g., Tanglish/Hinglish) is MANDATORY to ensure the script sounds natural and modern for social media.
+            - **EVERYTHING INSIDE JSON**: This applies to Hooks, Visual Directions, and Audio.
+            - **HUMAN TOUCH**: Write like a friend speaking to a friend. Focus on natural flow and "speaking" rather than "reading".
+            - **FACTUAL ACCURACY**: Ensure all information about the topic is 100% correct. Verified the origin, language, and facts carefully.
 
             Output ONLY valid JSON.`;
 
