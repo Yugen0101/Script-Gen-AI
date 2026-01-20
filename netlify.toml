@@ -6,9 +6,10 @@
   NODE_VERSION = "20"
   NEXT_PUBLIC_SUPABASE_URL = "https://vulbaduarnjcnieqryhf.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_wqg6_w1zgvyWHo84MouWyA_QUd_JLVd"
-  SUPABASE_SERVICE_ROLE_KEY = "sb_secret__cFvXe0zPHH1NytgE1DTIQ_vjARMhM7"
-  RESEND_API_KEY = "re_7y6x4cQ3_6s17L4PHx75udDNxcaCPExrQ"
-  GEMINI_API_KEY = "AIzaSyCGD80M3_GeT8A7a8zPkQljgtebx8XkPnQ"
+  # Sensitive keys should be set in the Netlify Dashboard, not here!
+  # SUPABASE_SERVICE_ROLE_KEY
+  # RESEND_API_KEY
+  # GEMINI_API_KEY
   NEXT_PUBLIC_APP_URL = "https://celadon-jelly-15f41e.netlify.app"
 
 [[plugins]]
