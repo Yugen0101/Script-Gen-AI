@@ -32,8 +32,8 @@ export async function generateScript({ platform, topic, tone, length, language, 
         }
     })
 
-    // Diagnostic log (Masked but detailed)
-    console.log(`[GenerateScript] API Key Check: Length=${apiKey.length}, Prefix=${apiKey.substring(0, 7)}, Suffix=${apiKey.slice(-4)}`)
+    // Diagnostic log (Masked)
+    console.log(`[GenerateScript] Using Gemini Key: ${apiKey.substring(0, 10)}...${apiKey.slice(-4)}`)
 
     try {
         const isShortInfo = length.toLowerCase().includes('short') || length.toLowerCase().includes('45s');
