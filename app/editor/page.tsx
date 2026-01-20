@@ -1,21 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MicOff, Youtube, Linkedin, Loader2, Copy, Check, Save, Rocket, Music2, Video } from 'lucide-react'
+import {
+    Loader2,
+    Youtube,
+    Instagram,
+    Linkedin,
+    Mic,
+    MicOff,
+    Volume2,
+    Globe,
+    Wrench,
+    ChevronDown,
+    Save,
+    Calendar as CalendarIcon,
+    Star,
+    Layout,
+    Check,
+    Copy,
+    Rocket,
+    Feather,
+    Newspaper
+} from 'lucide-react'
+import CustomSelect from '@/components/CustomSelect'
 import Logo from '@/components/Logo'
 import { generateScript } from '@/app/actions/generate-script'
-import { saveScript } from '@/app/actions/save-script'
+import { generateCalendarContent } from '@/app/actions/generate-calendar'
+import { saveScript, saveBundledScript } from '@/app/actions/save-script'
+import CalendarView from '@/components/CalendarView'
+import YouTubeView from '@/components/script-display/YouTubeView'
+import InstagramView from '@/components/script-display/InstagramView'
+import LinkedInView from '@/components/script-display/LinkedInView'
+import TwitterView from '@/components/script-display/TwitterView'
+
+
+
 
 export default function EditorPage() {
     const router = useRouter()
     const [platform, setPlatform] = useState('YouTube')
     const [topic, setTopic] = useState('')
     const [tone, setTone] = useState('Professional')
-    const [length, setLength] = useState('General writeup (2mins)')
-    const [customLength, setCustomLength] = useState('')
+    const [length, setLength] = useState('General (~60s)')
+    const [customLength, setCustomLength] = useState('60')
     const [language, setLanguage] = useState('English')
+    const [framework, setFramework] = useState('General')
+    const [customLengthSet, setCustomLengthSet] = useState(false)
 
     const [content, setContent] = useState('')
     const [title, setTitle] = useState('')
@@ -25,9 +57,53 @@ export default function EditorPage() {
     const [error, setError] = useState('')
     const [isListening, setIsListening] = useState(false)
     const [scriptData, setScriptData] = useState<any>(null)
-
+    const [duration, setDuration] = useState(7)
+    const [isCalendarMode, setIsCalendarMode] = useState(false)
+    const [multiDayScripts, setMultiDayScripts] = useState<any[]>([])
     const tones = ['Professional', 'Casual', 'Creative', 'Funny', 'Educational', 'Viral/High Energy', 'Controversial']
-    const lengths = ['Bytes (60secs)', 'General writeup (2mins)', 'Dive deep (4minutes)', 'Custom duration']
+
+
+    // Update default length based on platform if user hasn't custom set it
+    useEffect(() => {
+        if (!customLengthSet) {
+            if (['LinkedIn', 'Twitter'].includes(platform)) {
+                setCustomLength('200')
+            } else {
+                setCustomLength('60')
+            }
+        }
+    }, [platform, customLengthSet])
+
+
+
+
+
+
+    const loadingMessages = [
+        "Analyzing your topic...",
+        "Crafting a viral hook...",
+        "Brainstorming visual shots...",
+        "Writing detailed audio directions...",
+        "Structuring for maximum retention...",
+        "Finalizing your masterpiece..."
+    ]
+
+    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
+
+    // Update custom length based on preset
+
+
+    // Cycle through loading messages
+    useEffect(() => {
+        if (loading) {
+            const interval = setInterval(() => {
+                setLoadingMessageIndex(prev => (prev + 1) % loadingMessages.length)
+            }, 2500)
+            return () => clearInterval(interval)
+        } else {
+            setLoadingMessageIndex(0)
+        }
+    }, [loading])
 
     const startListening = () => {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -62,37 +138,78 @@ export default function EditorPage() {
         setError('')
         setContent('')
         setScriptData(null)
+        setMultiDayScripts([])
 
-        const result = await generateScript({
-            platform,
-            topic,
-            tone,
-            length: length === 'Custom duration' ? customLength : length,
-            language
-        })
+        const dayCount = isCalendarMode ? duration : 1
 
-        if (result.success && result.content) {
-            setContent(result.content) // Keep raw for copy/save
-            setTitle(topic)
 
-            // Try to parse JSON output
-            try {
-                // Clean markdown code blocks if present
-                const cleanContent = result.content.replace(/```json/g, '').replace(/```/g, '').trim()
-                const data = JSON.parse(cleanContent)
-                setScriptData(data)
-            } catch (e) {
-                console.error("Failed to parse script JSON", e)
+        if (dayCount > 1) {
+            // Multi-day calendar generation
+            const result = await generateCalendarContent({
+                platform,
+                topic,
+                tone,
+                language,
+                days: dayCount,
+                skipSave: true
+            })
+
+            if (result.success && result.scripts) {
+                setMultiDayScripts(result.scripts)
+                setContent(JSON.stringify(result.scripts)) // Store for potential bulk save
+            } else {
+                setError(result.error || 'Failed to generate calendar')
             }
         } else {
-            setError(result.error || 'Failed to generate script')
+            // Single script generation
+            const result = await generateScript({
+                platform,
+                topic,
+                tone,
+                length: `${customLength} ${['LinkedIn', 'Twitter'].includes(platform) ? 'words' : 'seconds'}`,
+                language,
+                framework: framework === 'General' ? undefined : framework
+            })
+
+            if (result.success && result.content) {
+                setContent(result.content)
+                setTitle(topic)
+
+                try {
+                    const cleanContent = result.content.replace(/```json/g, '').replace(/```/g, '').trim()
+                    let data = JSON.parse(cleanContent)
+
+                    // Fallback: Map sections to scenes if missing for Instagram
+                    if (platform.toLowerCase() === 'instagram' && !data.scenes && data.sections) {
+                        data.scenes = data.sections.map((s: any) => ({
+                            visual: s.visual,
+                            overlay: s.audio || '',
+                            duration: '5s'
+                        }))
+                    }
+                    // Fallback: Map scenes to sections if missing for YouTube
+                    if (platform.toLowerCase() === 'youtube' && !data.sections && data.scenes) {
+                        data.sections = data.scenes.map((s: any) => ({
+                            visual: s.visual,
+                            audio: s.overlay || ''
+                        }))
+                    }
+
+                    setScriptData(data)
+                } catch (e) {
+                    console.error("Failed to parse script JSON", e)
+                }
+            } else {
+                setError(result.error || 'Failed to generate script')
+            }
         }
 
         setLoading(false)
     }
 
+
     const handleSave = async () => {
-        if (!content.trim()) {
+        if (!content.trim() && multiDayScripts.length === 0) {
             setError('No content to save')
             return
         }
@@ -100,21 +217,43 @@ export default function EditorPage() {
         setSaving(true)
         setError('')
 
-        const result = await saveScript({
-            title: title || topic,
-            platform,
-            tone,
-            content,
-        })
+        try {
+            if (multiDayScripts.length > 0) {
+                // Bulk save for calendar (now bundled)
+                const result = await saveBundledScript(multiDayScripts, topic || 'Untitled Plan')
+                if (result.success) {
+                    router.push('/dashboard')
+                } else {
+                    setError(result.error || 'Failed to save scripts')
+                }
+            } else {
 
-        if (result.success) {
-            router.push('/dashboard')
-        } else {
-            setError(result.error || 'Failed to save script')
+                // Single script save
+                const result = await saveScript({
+                    title: title || topic || 'Untitled Script',
+                    platform,
+                    tone,
+                    content,
+                    language,
+                    length: `${customLength} seconds`,
+                    customLength: customLength
+                })
+
+
+                if (result.success) {
+                    router.push('/dashboard')
+                } else {
+                    setError(result.error || 'Failed to save script')
+                }
+            }
+        } catch (err: any) {
+
+            setError(err.message || 'An error occurred while saving')
+        } finally {
+            setSaving(false)
         }
-
-        setSaving(false)
     }
+
 
     const handleCopy = async () => {
         if (!content) return
@@ -126,18 +265,6 @@ export default function EditorPage() {
     return (
         <div className="min-h-screen bg-background">
             <main className="container mx-auto px-4 lg:px-6 pt-24 pb-8 relative z-0">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-6"
-                >
-                    <h1 className="text-4xl font-bold mb-2">
-                        <span className="gradient-text">ScriptGo</span>
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Create professional scripts powered by AI
-                    </p>
-                </motion.div>
 
                 <div className="grid lg:grid-cols-3 gap-6">
                     {/* Left Sidebar - Inputs */}
@@ -146,7 +273,7 @@ export default function EditorPage() {
                         animate={{ opacity: 1, x: 0 }}
                         className="lg:col-span-1"
                     >
-                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/50 dark:shadow-none">
+                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/50 dark:shadow-none bg-white/50 dark:bg-black/20 text-zinc-900 dark:text-white">
                             <div className="flex items-center gap-3 mb-6">
                                 <button onClick={() => router.back()} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white smooth-transition">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -157,7 +284,77 @@ export default function EditorPage() {
                                 </h2>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-8">
+                                {/* Content Calendar Picker */}
+                                <div>
+                                    <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-3">CONTENT CALENDAR</label>
+                                    <div className="space-y-3">
+                                        <div className="flex gap-2 p-1.5 bg-zinc-100 dark:bg-[#1A202C] rounded-2xl border border-zinc-200 dark:border-white/5 shadow-inner">
+                                            <button
+                                                onClick={() => setIsCalendarMode(false)}
+                                                className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold smooth-transition ${!isCalendarMode
+                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                1 Day
+                                            </button>
+                                            <button
+                                                onClick={() => setIsCalendarMode(true)}
+                                                className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold smooth-transition ${isCalendarMode
+                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                Calendar
+                                            </button>
+                                        </div>
+
+                                        <AnimatePresence>
+                                            {isCalendarMode && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-2xl space-y-4">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-2">
+                                                                <CalendarIcon className="w-4 h-4 text-blue-400" />
+                                                                <span className="text-sm font-medium text-zinc-300">Plan Duration</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <input
+                                                                    type="number"
+                                                                    value={duration}
+                                                                    onChange={(e) => setDuration(Math.max(2, parseInt(e.target.value) || 2))}
+                                                                    className="w-16 py-1.5 px-2 bg-zinc-100 dark:bg-[#1A202C] border border-blue-500/30 rounded-lg text-sm text-center font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                                                />
+                                                                <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Days</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            {[7, 30].map((d) => (
+                                                                <button
+                                                                    key={d}
+                                                                    onClick={() => setDuration(d)}
+                                                                    className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${duration === d
+                                                                        ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
+                                                                        : 'bg-zinc-100 dark:bg-[#0B1120] border-zinc-200 dark:border-white/5 text-zinc-500 hover:border-zinc-300 dark:hover:border-white/10 hover:text-zinc-600 dark:hover:text-zinc-400'
+                                                                        }`}
+                                                                >
+                                                                    {d} Days
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+
                                 {/* Platform */}
                                 <div>
                                     <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-3">PLATFORM</label>
@@ -166,7 +363,7 @@ export default function EditorPage() {
                                             onClick={() => setPlatform('YouTube')}
                                             className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'YouTube'
                                                 ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                                                : 'bg-[#1e293b] border-white/5 text-zinc-400 hover:bg-[#1e293b]/80 hover:border-white/10'
+                                                : 'bg-zinc-100 dark:bg-[#1e293b] border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-[#1e293b]/80 hover:border-zinc-300 dark:hover:border-white/10'
                                                 }`}
                                         >
                                             <Youtube className="w-5 h-5" />
@@ -176,31 +373,33 @@ export default function EditorPage() {
                                             onClick={() => setPlatform('LinkedIn')}
                                             className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'LinkedIn'
                                                 ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                                                : 'bg-[#1e293b] border-white/5 text-zinc-400 hover:bg-[#1e293b]/80 hover:border-white/10'
+                                                : 'bg-zinc-100 dark:bg-[#1e293b] border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-[#1e293b]/80 hover:border-zinc-300 dark:hover:border-white/10'
                                                 }`}
                                         >
                                             <Linkedin className="w-5 h-5" />
                                             <span className="text-sm font-medium">LinkedIn</span>
                                         </button>
                                         <button
-                                            onClick={() => setPlatform('TikTok')}
-                                            className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'TikTok'
+                                            onClick={() => setPlatform('Instagram')}
+                                            className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'Instagram'
                                                 ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                                                : 'bg-[#1e293b] border-white/5 text-zinc-400 hover:bg-[#1e293b]/80 hover:border-white/10'
+                                                : 'bg-zinc-100 dark:bg-[#1e293b] border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-[#1e293b]/80 hover:border-zinc-300 dark:hover:border-white/10'
                                                 }`}
                                         >
-                                            <Music2 className="w-5 h-5" />
-                                            <span className="text-sm font-medium">TikTok</span>
+                                            <Instagram className="w-5 h-5" />
+                                            <span className="text-sm font-medium">Instagram</span>
                                         </button>
                                         <button
-                                            onClick={() => setPlatform('Shorts')}
-                                            className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'Shorts'
+                                            onClick={() => setPlatform('Twitter')}
+                                            className={`p-3 rounded-xl border smooth-transition flex items-center gap-3 ${platform === 'Twitter'
                                                 ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                                                : 'bg-[#1e293b] border-white/5 text-zinc-400 hover:bg-[#1e293b]/80 hover:border-white/10'
+                                                : 'bg-zinc-100 dark:bg-[#1e293b] border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-[#1e293b]/80 hover:border-zinc-300 dark:hover:border-white/10'
                                                 }`}
                                         >
-                                            <Video className="w-5 h-5" />
-                                            <span className="text-sm font-medium">Shorts</span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5 fill-current">
+                                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                                            </svg>
+                                            <span className="text-sm font-medium">Twitter</span>
                                         </button>
                                     </div>
                                 </div>
@@ -227,95 +426,65 @@ export default function EditorPage() {
                                     </div>
                                 </div>
 
+
+
+
                                 {/* Tone */}
-                                <div>
-                                    <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">
-                                        SCRIPT TONE
-                                    </label>
-                                    <div className="relative">
-                                        <select
-                                            value={tone}
-                                            onChange={(e) => setTone(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-[#1A202C] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 smooth-transition appearance-none text-sm cursor-pointer text-zinc-900 dark:text-white"
-                                        >
-                                            {tones.map((t) => (
-                                                <option key={t} value={t}>{t}</option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></svg>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CustomSelect
+                                    label="SCRIPT TONE"
+                                    value={tone}
+                                    onChange={setTone}
+                                    options={tones}
+                                    icon={<Volume2 className="w-4 h-4" />}
+                                />
 
                                 {/* Length */}
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">
-                                            SCRIPT LENGTH
+                                            {['LinkedIn', 'Twitter'].includes(platform) ? 'POST LENGTH (WORDS)' : 'SCRIPT LENGTH (SECONDS)'}
                                         </label>
-                                        {length === 'Custom duration' && (
-                                            <span className="text-xs text-zinc-500">Custom Seconds</span>
-                                        )}
                                     </div>
-                                    <div className="flex gap-3">
-                                        <div className="relative flex-1">
-                                            <select
-                                                value={length}
-                                                onChange={(e) => setLength(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-[#1A202C] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 smooth-transition appearance-none text-sm cursor-pointer text-zinc-900 dark:text-white"
-                                            >
-                                                {lengths.map((l) => (
-                                                    <option key={l} value={l}>{l}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                            </div>
-                                        </div>
-                                        {length === 'Custom duration' && (
-                                            <motion.div
-                                                initial={{ opacity: 0, width: 0 }}
-                                                animate={{ opacity: 1, width: '6rem' }}
-                                                className="overflow-hidden"
-                                            >
-                                                <input
-                                                    value={customLength}
-                                                    onChange={(e) => setCustomLength(e.target.value)}
-                                                    placeholder="60"
-                                                    className="w-full h-full px-3 py-3 bg-zinc-50 dark:bg-[#1A202C] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 smooth-transition text-sm text-center text-zinc-900 dark:text-white placeholder:text-zinc-400"
-                                                />
-                                            </motion.div>
-                                        )}
+                                    <div className="w-full">
+                                        <input
+                                            type="number"
+                                            value={customLength}
+                                            onChange={(e) => {
+                                                setCustomLength(e.target.value)
+                                                setCustomLengthSet(true)
+                                            }}
+                                            placeholder={['LinkedIn', 'Twitter'].includes(platform) ? "200" : "60"}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#1A202C] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 smooth-transition text-sm text-zinc-900 dark:text-white"
+                                        />
                                     </div>
                                 </div>
 
+                                {/* Framework */}
+                                <CustomSelect
+                                    label="MARKETING FRAMEWORK"
+                                    value={framework === 'General' ? 'General (No framework)' : `${framework} Framework`}
+                                    onChange={(val) => {
+                                        const actualVal = val.startsWith('General') ? 'General' : val.split(' ')[0]
+                                        setFramework(actualVal)
+                                    }}
+                                    options={['General (No framework)', 'AIDA Framework', 'PAS Framework']}
+                                    icon={<Wrench className="w-4 h-4" />}
+                                />
+
                                 {/* Language */}
-                                <div>
-                                    <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">
-                                        SCRIPT LANGUAGE
-                                    </label>
-                                    <div className="relative">
-                                        <select
-                                            value={language}
-                                            onChange={(e) => setLanguage(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-[#1A202C] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 smooth-transition appearance-none text-sm cursor-pointer text-zinc-900 dark:text-white"
-                                        >
-                                            {['English', 'Spanish', 'French', 'German', 'Hindi', 'Tamil', 'Telugu', 'Kannada'].map((l) => (
-                                                <option key={l} value={l}>{l}</option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" x2="22" y1="12" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CustomSelect
+                                    label="SCRIPT LANGUAGE"
+                                    value={language}
+                                    onChange={setLanguage}
+                                    options={['English', 'Spanish', 'French', 'German', 'Hindi', 'Tamil', 'Telugu', 'Kannada']}
+                                    icon={<Globe className="w-4 h-4" />}
+                                />
 
                                 {/* Generate Button */}
                                 <button
                                     onClick={handleGenerate}
                                     disabled={loading || !topic.trim()}
-                                    className="w-full py-4 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl smooth-transition shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+                                    className="w-full py-4 px-4 btn-royal text-base hover:brightness-110 flex items-center justify-center gap-3 mt-4"
                                 >
                                     {loading ? (
                                         <>
@@ -359,10 +528,80 @@ export default function EditorPage() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="flex flex-col items-center justify-center h-full"
+                                        className="flex flex-col items-center justify-center h-full space-y-8"
                                     >
-                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                                        <p className="text-muted-foreground">Generating your magic...</p>
+                                        <div className="relative w-32 h-32 flex items-center justify-center">
+                                            {/* Advanced Animated Loading Icon */}
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    rotate: [0, 180, 360],
+                                                    borderRadius: ["20%", "50%", "20%"],
+                                                }}
+                                                transition={{
+                                                    duration: 3,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                }}
+                                                className="absolute inset-0 border-2 border-blue-500/30 dark:border-blue-400/20"
+                                            />
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1.2, 1, 1.2],
+                                                    rotate: [360, 180, 0],
+                                                    borderRadius: ["50%", "20%", "50%"],
+                                                }}
+                                                transition={{
+                                                    duration: 4,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                }}
+                                                className="absolute inset-0 border-2 border-purple-500/30 dark:border-purple-400/20"
+                                            />
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1, 1.1, 1],
+                                                    opacity: [0.5, 1, 0.5],
+                                                }}
+                                                transition={{
+                                                    duration: 2,
+                                                    repeat: Infinity,
+                                                    ease: "linear",
+                                                }}
+                                                className="relative z-10"
+                                            >
+                                                <Logo className="w-12 h-12 text-blue-500" />
+                                            </motion.div>
+
+                                            {/* Orbital pulse */}
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1, 1.5],
+                                                    opacity: [0.5, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 1.5,
+                                                    repeat: Infinity,
+                                                    ease: "easeOut"
+                                                }}
+                                                className="absolute w-full h-full border border-blue-500 rounded-full"
+                                            />
+                                        </div>
+
+                                        <div className="text-center space-y-2">
+                                            <AnimatePresence mode="wait">
+                                                <motion.p
+                                                    key={loadingMessageIndex}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+                                                >
+                                                    {loadingMessages[loadingMessageIndex]}
+                                                </motion.p>
+                                            </AnimatePresence>
+                                            <p className="text-sm text-muted-foreground animate-pulse">Our AI is putting on its creative hat...</p>
+                                        </div>
                                     </motion.div>
                                 ) : content ? (
                                     <motion.div
@@ -372,16 +611,25 @@ export default function EditorPage() {
                                         exit={{ opacity: 0 }}
                                         className="h-full flex flex-col"
                                     >
-                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-zinc-50/50 dark:bg-[#0B1120]/50 backdrop-blur-sm sticky top-0 z-20">
-                                            <div>
-                                                <h3 className="font-semibold text-zinc-900 dark:text-white">{title || 'Generated Script'}</h3>
-                                                <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
-                                                    <span className="uppercase">{platform}</span>
-                                                    <span>•</span>
-                                                    <span>{language}</span>
+                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center bg-zinc-50/50 dark:bg-[#0B1120]/50 backdrop-blur-sm sticky top-0 z-20 gap-4">
+                                            <div className="flex items-center gap-4 w-full sm:w-auto">
+                                                <div>
+                                                    <h3 className="font-semibold text-zinc-900 dark:text-white leading-tight">{title || 'Generated Content'}</h3>
+                                                    <div className="flex gap-2 text-[10px] text-muted-foreground mt-0.5">
+                                                        <span className="uppercase">{platform}</span>
+                                                        <span>•</span>
+                                                        <span>{language}</span>
+                                                        {multiDayScripts.length > 0 && (
+                                                            <>
+                                                                <span>•</span>
+                                                                <span className="text-blue-500 font-bold">{multiDayScripts.length} DAYS</span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 w-full sm:w-auto justify-end">
+
                                                 <button
                                                     onClick={handleCopy}
                                                     className="px-3 py-1.5 bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/20 rounded-lg smooth-transition text-xs font-medium flex items-center gap-2"
@@ -392,51 +640,38 @@ export default function EditorPage() {
                                                 <button
                                                     onClick={handleSave}
                                                     disabled={saving}
-                                                    className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg smooth-transition text-xs font-medium flex items-center gap-2 disabled:opacity-50"
+                                                    className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg smooth-transition text-xs font-bold flex items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/20"
                                                 >
                                                     {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                                                    Done
+                                                    Confirm Save
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                                            {scriptData ? (
-                                                <div className="space-y-6 max-w-4xl mx-auto">
-                                                    {/* Hook Strategy */}
-                                                    {scriptData.hook && (
-                                                        <div className="bg-zinc-900 dark:bg-[#0f172a] rounded-xl p-6 border border-zinc-200 dark:border-white/10 relative overflow-hidden group shadow-lg">
-                                                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                                                <Logo className="w-32 h-32 rotate-12" />
-                                                            </div>
-                                                            <div className="relative z-10">
-                                                                <div className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-3">HOOK STRATEGY</div>
-                                                                <div className="text-xl md:text-2xl font-medium text-white leading-relaxed">
-                                                                    {scriptData.hook}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
 
-                                                    {/* Visual/Audio Table */}
-                                                    <div className="border border-zinc-200 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-[#0f172a]/40 shadow-sm">
-                                                        <div className="grid grid-cols-2 border-b border-zinc-200 dark:border-white/10 bg-zinc-50/80 dark:bg-white/5 backdrop-blur-sm">
-                                                            <div className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">VISUAL (SEE)</div>
-                                                            <div className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-l border-zinc-200 dark:border-white/10">AUDIO (HEAR)</div>
-                                                        </div>
-                                                        {scriptData.sections?.map((section: any, idx: number) => (
-                                                            <div key={idx} className="grid grid-cols-2 border-b last:border-0 border-zinc-200 dark:border-white/10 group hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                                                                <div className="p-5 text-sm text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed relative">
-                                                                    <span className="absolute top-5 left-2 text-[10px] font-mono text-zinc-300 dark:text-zinc-700 select-none">0{idx + 1}</span>
-                                                                    <div className="pl-4">{section.visual}</div>
-                                                                </div>
-                                                                <div className="p-5 text-sm text-zinc-800 dark:text-zinc-100 leading-relaxed border-l border-zinc-200 dark:border-white/10 bg-zinc-50/30 dark:bg-white/[0.02]">
-                                                                    {section.audio}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                                            {multiDayScripts.length > 0 ? (
+                                                <div className="max-w-6xl mx-auto">
+                                                    <CalendarView
+                                                        scripts={multiDayScripts.map(s => ({ ...s, platform }))}
+                                                        days={isCalendarMode ? duration : 1}
+                                                    />
+
+
                                                 </div>
+                                            ) : scriptData ? (
+                                                <>
+                                                    {/* Platform-Specific Rendering */}
+                                                    {platform.toLowerCase() === 'instagram' || platform.toLowerCase() === 'insta reels' || platform.toLowerCase() === 'tiktok' ? (
+                                                        <InstagramView scriptData={scriptData} />
+                                                    ) : platform.toLowerCase() === 'linkedin' ? (
+                                                        <LinkedInView scriptData={scriptData} />
+                                                    ) : platform.toLowerCase() === 'twitter' ? (
+                                                        <TwitterView scriptData={scriptData} />
+                                                    ) : (
+                                                        <YouTubeView scriptData={scriptData} />
+                                                    )}
+                                                </>
                                             ) : (
                                                 <textarea
                                                     value={content}
@@ -446,6 +681,7 @@ export default function EditorPage() {
                                                 />
                                             )}
                                         </div>
+
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -455,10 +691,10 @@ export default function EditorPage() {
                                         exit={{ opacity: 0 }}
                                         className="flex flex-col items-center justify-center h-full text-center p-8"
                                     >
-                                        <div className="w-24 h-24 rounded-3xl bg-[#0B1120] border border-blue-500/10 flex items-center justify-center mb-6 shadow-2xl shadow-blue-900/10">
-                                            <Rocket className="w-10 h-10 text-blue-500" />
+                                        <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-[#0B1120] border border-blue-500/10 flex items-center justify-center mb-6 shadow-2xl shadow-blue-900/10">
+                                            <Logo className="w-12 h-12" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2 text-zinc-200">Ready to create?</h3>
+                                        <h3 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-zinc-200">Ready to create?</h3>
                                         <p className="text-zinc-500">
                                             Configure your script settings on the left.
                                         </p>

@@ -1,0 +1,15 @@
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# AI Configuration (The app currently uses OpenAI)
+OPENAI_API_KEY=your-openai-key
+
+# Optional: Google Gemini Configuration (Mentioned in README)
+GEMINI_API_KEY=your-gemini-key
+
+# Email Service (Resend)
+RESEND_API_KEY=your-resend-api-key
+
+# Cron Job Security (Optional - for daily brief emails)
+CRON_SECRET=your-random-secret-string

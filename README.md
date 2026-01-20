@@ -1,4 +1,4 @@
-# ScriptGo - AI-Powered Script Generator
+# Script GO - AI-Powered Script Generator
 
 A modern web application that generates professional video scripts and LinkedIn posts using AI.
 

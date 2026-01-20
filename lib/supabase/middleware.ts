@@ -6,9 +6,19 @@ export async function updateSession(request: NextRequest) {
         request,
     })
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    // If env vars are missing, we can't create the client.
+    // Return the response as is to avoid a crash, but auth won't work.
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Middleware: Supabase URL and Anon Key are missing!')
+        return supabaseResponse
+    }
+
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
@@ -32,13 +42,16 @@ export async function updateSession(request: NextRequest) {
     // issues with users being randomly logged out.
 
     const {
-        data: { user },
-    } = await supabase.auth.getUser()
+        data: { session },
+    } = await supabase.auth.getSession()
+    const user = session?.user
 
     // Protected routes
     if (
         !user &&
         !request.nextUrl.pathname.startsWith('/login') &&
+        !request.nextUrl.pathname.startsWith('/auth') &&
+        !request.nextUrl.pathname.startsWith('/update-password') &&
         request.nextUrl.pathname !== '/'
     ) {
         // no user, potentially respond by redirecting the user to the login page

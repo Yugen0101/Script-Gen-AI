@@ -1,62 +1,45 @@
-"use client"
+'use client'
 
+import * as React from "react"
+import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import { motion } from "framer-motion"
-import { Sun, Moon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 
-export default function ThemeToggle() {
+export function ThemeToggle() {
     const { theme, setTheme } = useTheme()
-    const [mounted, setMounted] = useState(false)
+    const [mounted, setMounted] = React.useState(false)
 
-    // Avoid hydration mismatch
-    useEffect(() => setMounted(true), [])
+    React.useEffect(() => {
+        setMounted(true)
+    }, [])
 
-    if (!mounted) return null
+    if (!mounted) {
+        return <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-100 dark:bg-white/5 border border-transparent" />
+    }
+
+    const isDark = theme === 'dark'
 
     return (
         <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="relative w-14 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 p-1 smooth-transition overflow-hidden hover:shadow-inner"
-            aria-label="Toggle Theme"
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200 dark:border-white/10 smooth-transition overflow-hidden group"
+            aria-label="Toggle theme"
         >
-            <motion.div
-                className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none"
-                initial={false}
-            >
-                <Sun className="w-4 h-4 text-amber-500 opacity-0 dark:opacity-50" />
-                <Moon className="w-4 h-4 text-blue-400 opacity-50 dark:opacity-0" />
-            </motion.div>
-
-            <motion.div
-                layout
-                transition={{
-                    type: "spring",
-                    stiffness: 700,
-                    damping: 30
-                }}
-                className={`w-5 h-5 rounded-full shadow-sm flex items-center justify-center relative z-10 
-                    ${theme === 'dark' ? 'bg-[#0B1120] translate-x-6' : 'bg-white translate-x-0'}
-                `}
-            >
+            <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                    initial={false}
-                    animate={{ rotate: theme === 'dark' ? 0 : 180, scale: theme === 'dark' ? 1 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute inset-0 flex items-center justify-center"
+                    key={isDark ? 'dark' : 'light'}
+                    initial={{ y: 20, opacity: 0, rotate: -45 }}
+                    animate={{ y: 0, opacity: 1, rotate: 0 }}
+                    exit={{ y: -20, opacity: 0, rotate: 45 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
                 >
-                    <Moon className="w-3 h-3 text-blue-400 fill-blue-400/20" />
+                    {isDark ? (
+                        <Moon className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+                    ) : (
+                        <Sun className="w-5 h-5 text-amber-500 group-hover:text-amber-600" />
+                    )}
                 </motion.div>
-
-                <motion.div
-                    initial={false}
-                    animate={{ rotate: theme === 'dark' ? -180 : 0, scale: theme === 'dark' ? 0 : 1 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                >
-                    <Sun className="w-3 h-3 text-amber-500 fill-amber-500/20" />
-                </motion.div>
-            </motion.div>
+            </AnimatePresence>
         </button>
     )
 }

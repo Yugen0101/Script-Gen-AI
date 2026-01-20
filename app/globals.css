@@ -4,12 +4,32 @@
 
 @layer base {
   :root {
-    /* Royal Dark Theme Base */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
     --background: 222 47% 11%;
-    /* Dark Royal Blue Base */
     --foreground: 210 40% 98%;
 
-    /* Electric Blue Primary */
     --primary: 199 89% 48%;
     --primary-foreground: 210 40% 98%;
 
@@ -25,8 +45,6 @@
     --border: 217 33% 20%;
     --input: 217 33% 20%;
     --ring: 199 89% 48%;
-
-    --radius: 0.75rem;
   }
 }
 
@@ -43,46 +61,45 @@
 
 @layer components {
 
-  /* Global Button Style with Royal+Thunder Gradient */
+  /* Global Button Style - Premium Solid (Brightened) */
   .btn-royal {
-    @apply bg-royal-thunder hover:bg-royal-thunder-hover text-white font-semibold rounded-xl transition-all duration-300 transform active:scale-95 active:bg-blue-600 shadow-royal hover:shadow-royal-hover border border-white/10 backdrop-blur-sm relative overflow-hidden;
+    @apply bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl transition-all duration-300 transform active:scale-[0.98] shadow-lg shadow-blue-500/30 border-b-4 border-blue-700 backdrop-blur-sm relative overflow-hidden;
   }
 
-  /* Shine effect on hover */
-  .btn-royal::after {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] transition-transform duration-700;
-  }
-
-  .btn-royal:hover::after {
-    @apply translate-x-[200%];
-  }
+  /* Removed Shine effect for cleaner look */
 }
 
 @layer utilities {
-  .glass {
-    @apply bg-[#0f172a] border border-blue-500/10 shadow-lg shadow-blue-500/5;
+  .glass-premium {
+    @apply bg-white/5 dark:bg-white/[0.03] border border-white/10 backdrop-blur-2xl;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
   }
 
-  .glass-hover {
-    @apply hover:border-blue-500/30 hover:shadow-blue-500/10 transition-all duration-300;
+  .shadow-premium {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
   }
 
-  .neon-border {
-    @apply border border-blue-500/20 shadow-[0_0_15px_rgba(59, 130, 246, 0.1)];
+  .dark .shadow-premium {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   }
 
-  .focus-neon {
-    @apply focus:border-blue-500/50 focus:shadow-[0_0_10px_rgba(59, 130, 246, 0.3)] focus:outline-none transition-all duration-300;
+  .nav-link-bespoke {
+    @apply relative text-zinc-400 hover:text-white transition-colors duration-300 py-1;
   }
 
-  .gradient-text {
+  .nav-link-active {
     @apply text-white;
-    /* Removed gradient */
   }
 
-  .smooth-transition {
-    @apply transition-all duration-300 ease-out;
+  .nav-link-active::after {
+    @apply absolute bottom-0 left-0 w-full h-[1px] bg-blue-400 opacity-100;
+    content: '';
+    box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+  }
+
+  .btn-bespoke-white {
+    @apply bg-white text-black font-bold rounded-full px-6 py-2 transition-all duration-300 hover:scale-105 active:scale-95;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
   }
 
   /* Haptic active state for all clickable elements */

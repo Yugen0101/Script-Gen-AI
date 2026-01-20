@@ -32,6 +32,8 @@ yarn-error.log*
 # env files
 .env*.local
 .env
+*.env.utf8
+.env.local.utf8
 
 # vercel
 .vercel
