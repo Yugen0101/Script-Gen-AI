@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Maximize2, X, CheckCircle2, XCircle, RotateCcw, FileText } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Maximize2, X, CheckCircle2, XCircle, RotateCcw, FileText, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import CalendarDay from './CalendarDay'
 
@@ -265,34 +265,78 @@ function ScriptPreview({ content, platform }: { content: any, platform: string }
         return <YouTubeView scriptData={data} />
     }
 
-    // Default Fallback
+    // Default Fallback - Premium General View
     return (
-        <div className="space-y-6">
+        <div className="max-w-4xl mx-auto space-y-8 pb-12">
+            {/* Platform Header Pill */}
+            <div className="flex justify-center">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-full border border-blue-500/20 backdrop-blur-md">
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">General Content Strategy</span>
+                </div>
+            </div>
+
+            {/* Hook Strategy */}
             {data.hook && (
-                <div className="p-6 rounded-[2rem] bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/10">
-                    <h4 className="text-[10px] font-black text-blue-500 dark:text-blue-400 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        The Impact Hook
-                    </h4>
-                    <p className="text-zinc-800 dark:text-zinc-200 text-lg font-bold leading-tight italic">
-                        "{data.hook}"
-                    </p>
+                <div className="relative group lg:mx-8">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                    <div className="relative bg-white dark:bg-[#0f172a] rounded-[2rem] p-8 border border-zinc-200 dark:border-white/10 shadow-xl">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-blue-500 rounded-lg">
+                                <Sparkles className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">The Impact Hook</span>
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white leading-tight italic">
+                            "{data.hook}"
+                        </h2>
+                    </div>
                 </div>
             )}
 
+            {/* Content Sections */}
             <div className="space-y-4">
-                {data.sections?.map((section: any, idx: number) => (
-                    <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-0.5 rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-white/5">
-                        <div className="p-6 bg-white dark:bg-white/[0.02]">
-                            <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest block mb-2">Visual Strategy</span>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{section.visual}</p>
-                        </div>
-                        <div className="p-6 bg-zinc-50 dark:bg-white/[0.04]">
-                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest block mb-2">Audio / Script</span>
-                            <p className="text-sm text-zinc-900 dark:text-zinc-100 font-bold leading-relaxed italic">"{section.audio}"</p>
-                        </div>
+                <div className="flex items-center justify-between px-6 lg:px-8">
+                    <div className="flex items-center gap-2">
+                        <motion.div
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ repeat: Infinity, duration: 4 }}
+                        >
+                            <FileText className="w-5 h-5 text-zinc-400" />
+                        </motion.div>
+                        <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Script Blueprint</h3>
                     </div>
-                ))}
+                    <div className="text-[10px] font-medium text-zinc-400 uppercase tracking-tighter">Total Sections: {data.sections?.length || 0}</div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:mx-8">
+                    {data.sections?.map((section: any, idx: number) => (
+                        <div key={idx} className="group relative flex flex-col md:flex-row gap-0.5 rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-white/10 shadow-md hover:shadow-lg transition-all duration-300">
+                            {/* Sequence Number */}
+                            <div className="md:w-24 bg-zinc-50 dark:bg-white/[0.03] p-6 flex items-center justify-center border-b md:border-b-0 md:border-r border-zinc-200 dark:border-white/10 font-black text-2xl text-zinc-200 dark:text-zinc-800 group-hover:text-blue-500/20 transition-colors">
+                                {(idx + 1).toString().padStart(2, '0')}
+                            </div>
+
+                            {/* Content split */}
+                            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2">
+                                <div className="p-6 bg-white dark:bg-[#0f172a]">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                                        <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Visual Strategy</span>
+                                    </div>
+                                    <p className="text-sm text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{section.visual}</p>
+                                </div>
+                                <div className="p-6 bg-zinc-50 dark:bg-white/[0.04] border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-white/10">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                        <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Audio / Script</span>
+                                    </div>
+                                    <p className="text-sm text-zinc-900 dark:text-zinc-100 font-bold leading-relaxed italic">"{section.audio}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

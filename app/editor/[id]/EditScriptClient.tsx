@@ -388,7 +388,8 @@ export default function EditScriptClient({ script }: { script: Script }) {
             return {
                 ...s,
                 scheduled_date: d.toISOString().split('T')[0],
-                status
+                status,
+                platform: s.platform || script.platform || platform // Ensure platform is passed for proper layout
             }
         })
     }
