@@ -17,7 +17,7 @@ A modern web application that generates professional video scripts and LinkedIn 
 - **Frontend**: Next.js 15, React 19, Tailwind CSS, Framer Motion
 - **Backend**: Supabase (Auth & Database)
 - **AI**: Google Gemini API
-- **Deployment**: Netlify
+- **Deployment**: Vercel (Production: https://script-gen-ai-one.vercel.app)
 
 ## Getting Started
 
@@ -42,7 +42,7 @@ GEMINI_API_KEY=your_gemini_api_key
 npm run dev
 ```
 
-5. Open [http://localhost:3005](http://localhost:3005)
+5. Open [http://localhost:3000](http://localhost:3000)
 
 ## Deployment
 
@@ -51,7 +51,7 @@ For detailed instructions on how to deploy this application manually, please ref
 - 📑 [Manual Deployment Guide](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/DEPLOYMENT.md) - Step-by-step instructions for Vercel, Netlify, and Self-hosting.
 - ✅ [Pre-Deployment Checklist](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/DEPLOYMENT_CHECKLIST.md) - Ensuring everything is ready before you go live.
 
-This app is configured for Netlify deployment by default via `netlify.toml`. Make sure to set all required environment variables (see [.env.example](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/.env.example)) in your hosting dashboard.
+This app is configured for Vercel deployment. Make sure to set all required environment variables (see [.env.example](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/.env.example)) in your Vercel project settings.
 
 ## License
 

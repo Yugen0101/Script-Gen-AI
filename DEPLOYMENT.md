@@ -13,10 +13,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 RESEND_API_KEY=YOUR_RESEND_API_KEY
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
-NEXT_PUBLIC_APP_URL=https://your-production-domain.com
+NEXT_PUBLIC_APP_URL=https://script-gen-ai-one.vercel.app
 ```
 
-> **⚠️ IMPORTANT**: Update `NEXT_PUBLIC_APP_URL` to your actual production domain before deployment!
+> **⚠️ IMPORTANT**: Update `NEXT_PUBLIC_APP_URL` to your actual production domain (`https://script-gen-ai-one.vercel.app`) before deployment!
 
 ### 2. Database Setup
 Ensure your Supabase database has all required tables and triggers:
