@@ -7,6 +7,10 @@ export async function createClient() {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
     if (!supabaseUrl || !supabaseAnonKey) {
+        if (process.env.NODE_ENV === 'production') {
+            console.warn('Supabase Server Environment Variables Missing during build!')
+            return {} as any
+        }
         throw new Error('Supabase URL and Anon Key are required! Please check your .env.local file.')
     }
 

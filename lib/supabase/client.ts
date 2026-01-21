@@ -5,11 +5,10 @@ export function createClient() {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('Supabase Environment Variables Missing!', {
-            urlLength: supabaseUrl ? supabaseUrl.length : 0,
-            keyLength: supabaseAnonKey ? supabaseAnonKey.length : 0,
-            NODE_ENV: process.env.NODE_ENV
-        })
+        if (process.env.NODE_ENV === 'production') {
+            console.warn('Supabase Environment Variables Missing during build! Prerendering may be incomplete.')
+            return {} as any // Return dummy object to prevent crash during build
+        }
         throw new Error('Supabase URL and Anon Key are required! Please check your .env.local file.')
     }
 
