@@ -104,10 +104,13 @@ export async function generateCalendarContent({ platform, topic, tone, language,
             return { success: false, error: 'Failed to generate content plan.' };
         }
 
-        // Step 2: For each day, generate a full script in parallel
+        // Step 2: For each day, generate a full script SEQUENTIALLY
         const today = new Date();
+        const results = [];
 
-        const scriptPromises = plan.map(async (item: any) => {
+        for (const item of plan) {
+            console.log(`🎬 Generating script for Day ${item.day}/${days}: ${item.title}`);
+
             const scriptInstructions = `You are a world-class script writer for ${platform}. 
             Generate a script for Day ${item.day} of a ${days}-day challenge.
             Title: ${item.title}
@@ -125,20 +128,16 @@ export async function generateCalendarContent({ platform, topic, tone, language,
             }
 
             The entire script content MUST be in ${language}. 
+            Keep the script length to approximately 60 seconds.
             
-            CRITICAL LANGUAGE REQUIREMENT & ACCURACY:
-            - If ${language} is English, the entire script must be in English.
-            - If ${language} is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST generate a script that is **HYPER-CONVERSATIONAL**, **EASY TO SPEAK**, and **MODERN**.
-            - **THE "TALK TEST"**: It must sound like a social media creator, NOT a dictionary or a news reporter.
-            - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for basic sentence structure.
-            - **MANDATORY ENGLISH (TANGLISH/KANGLISH style)**: For ANY word that is technical, formal, or complicated, **YOU MUST** use the **ENGLISH** word (written in English script). 
-            - **NO FORMAL WORDS**: Avoid formal/literary native words. Use the common English equivalent instead.
-            - **GOAL**: The script must be "talkable" and follow the flow of how people naturally speak on social media today.
-            - **EVERYTHING INSIDE JSON**: This applies to Hooks, Visual Directions, and Audio.
-            - **FACTUAL ACCURACY**: Ensure all information about the topic is 100% correct.
+            CRITICAL LANGUAGE REQUIREMENT:
+            - If ${language} is English, use English.
+            - If ${language} is NOT English, use native script but keep technical words in English.
+            - High energy, conversational tone.
 
             Output ONLY valid JSON.`;
 
+            let scriptContent = null;
             try {
                 const scriptResult = await model.generateContent(scriptInstructions);
                 const scriptResponse = await scriptResult.response;
@@ -150,24 +149,38 @@ export async function generateCalendarContent({ platform, topic, tone, language,
                     scriptRaw = scriptRaw.split('```')[1].split('```')[0].trim();
                 }
 
-                const scriptContent = JSON.parse(scriptRaw);
+                scriptContent = JSON.parse(scriptRaw);
+                console.log(`✅ Success for Day ${item.day}`);
+            } catch (err) {
+                console.error(`❌ Failed to generate script for day ${item.day}:`, err);
+                // Fallback content to prevent empty cards
+                scriptContent = {
+                    hook: `Welcome to Day ${item.day}! Today we're diving into ${item.title}.`,
+                    sections: [
+                        { visual: "Creator on camera", audio: `Hey everyone! Today is day ${item.day} and we're talking about ${item.title}.` },
+                        { visual: "Dynamic transitions", audio: `${item.brief}` },
+                        { visual: "Call to action", audio: "Don't forget to follow for the rest of the challenge!" }
+                    ]
+                };
+            }
 
-                // Calculate scheduled date
-                const scheduledDate = new Date(today);
-                scheduledDate.setDate(today.getDate() + (item.day - 1));
-                const dateString = scheduledDate.toISOString().split('T')[0];
+            // Calculate scheduled date
+            const scheduledDate = new Date(today);
+            scheduledDate.setDate(today.getDate() + (item.day - 1));
+            const dateString = scheduledDate.toISOString().split('T')[0];
 
-                if (skipSave) {
-                    return {
-                        title: item.title,
-                        platform: platform,
-                        tone: tone,
-                        language: language,
-                        content: scriptContent,
-                        scheduled_date: dateString
-                    };
-                }
+            let dataToReturn = null;
 
+            if (skipSave) {
+                dataToReturn = {
+                    title: item.title,
+                    platform: platform,
+                    tone: tone,
+                    language: language,
+                    content: scriptContent,
+                    scheduled_date: dateString
+                };
+            } else {
                 // Save to database
                 const { data, error } = await supabase.from('scripts').insert({
                     user_id: user.id,
@@ -176,23 +189,33 @@ export async function generateCalendarContent({ platform, topic, tone, language,
                     tone: tone,
                     language: language,
                     content: scriptContent,
-                    length: '60s', // Default length for calendar items
+                    length: '60s',
                     scheduled_date: dateString
                 }).select().single();
 
                 if (error) {
                     console.error(`Error saving script for day ${item.day}:`, error);
-                    return null;
+                    // Add as unsaved data
+                    dataToReturn = {
+                        title: item.title,
+                        platform: platform,
+                        tone: tone,
+                        language: language,
+                        content: scriptContent,
+                        scheduled_date: dateString
+                    };
+                } else {
+                    dataToReturn = data;
                 }
-                return data;
-
-            } catch (err) {
-                console.error(`Error generating script for day ${item.day}:`, err);
-                return null;
             }
-        });
 
-        const results = (await Promise.all(scriptPromises)).filter(r => r !== null);
+            if (dataToReturn) results.push(dataToReturn);
+
+            // Subtle delay to respect potential rate limits (150ms)
+            await new Promise(resolve => setTimeout(resolve, 150));
+        }
+
+        console.log(`✨ Total scripts generated: ${results.length}/${days}`);
 
         if (results.length === 0) {
             return { success: false, error: 'Failed to generate any scripts for the calendar.' };
