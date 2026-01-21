@@ -1,16 +1,9 @@
 [build]
-  command = "npm run build && node fix-paths.js"
+  command = "npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
-  NEXT_PUBLIC_SUPABASE_URL = "https://vulbaduarnjcnieqryhf.supabase.co"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_wqg6_w1zgvyWHo84MouWyA_QUd_JLVd"
-  # Sensitive keys should be set in the Netlify Dashboard, not here!
-  # SUPABASE_SERVICE_ROLE_KEY
-  # RESEND_API_KEY
-  # GEMINI_API_KEY
-  NEXT_PUBLIC_APP_URL = "https://celadon-jelly-15f41e.netlify.app"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
