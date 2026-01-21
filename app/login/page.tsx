@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowLeft, Loader2, ArrowRight } from 'lucide-react'
 import Logo from '@/components/Logo'
+import { sendWelcomeEmail } from '@/app/actions/email'
 
 const formatError = (err: any) => {
     if (!err) return 'No error'
@@ -75,9 +76,17 @@ function LoginContent() {
 
                 if (data?.session) {
                     // Auto-confirmation worked - redirect to dashboard
+                    // Send welcome email in the background
+                    sendWelcomeEmail(email, username || 'User').catch(err => {
+                        console.error('Failed to send welcome email:', err)
+                    })
                     window.location.href = '/dashboard'
                 } else if (data?.user) {
                     // Verification email sent
+                    // Send welcome email in the background
+                    sendWelcomeEmail(email, username || 'User').catch(err => {
+                        console.error('Failed to send welcome email:', err)
+                    })
                     setSuccessMessage('Please check your email to confirm your account and start generating scripts.')
                 } else {
                     throw new Error('Something went wrong during sign up.')

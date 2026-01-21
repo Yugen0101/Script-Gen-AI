@@ -184,18 +184,27 @@ ENSURE THE OUTPUT IS PURE VALID JSON ONLY. NO MARKDOWN BLOCK.`;
                 const { data: { user } } = await supabase.auth.getUser()
 
                 if (user && user.email) {
-                    let preview = "Check your script in the dashboard.";
-                    let title = topic;
+                    let preview = "Your script is ready! Check your dashboard to view and edit it.";
+                    let title = topic || "Your Script";
+
                     try {
                         const jsonContent = JSON.parse(content);
-                        if (jsonContent.hook) preview = jsonContent.hook;
-                    } catch (e) { }
+                        if (jsonContent.hook) {
+                            preview = jsonContent.hook.substring(0, 150) + (jsonContent.hook.length > 150 ? '...' : '');
+                        }
+                        if (jsonContent.title) title = jsonContent.title;
+                    } catch (e) {
+                        console.log('Could not parse script content for email preview, using fallback');
+                    }
 
-                    console.log('--- SENDING SCRIPT EMAIL (Gemini) ---');
-                    await sendScriptReadyEmail(user.email, title, preview, 'generated');
+                    console.log('📧 Sending script ready email to:', user.email);
+                    const result = await sendScriptReadyEmail(user.email, title, preview, 'generated');
+                    console.log('📧 Email send result:', result);
+                } else {
+                    console.log('⚠️ No user or email found, skipping script ready email');
                 }
             } catch (emailError) {
-                console.error("Failed to send script ready email", emailError)
+                console.error("❌ Failed to send script ready email:", emailError)
             }
         })
 
