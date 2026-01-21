@@ -64,7 +64,7 @@ export default function CustomSelect({
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                    <ChevronDown className="w-4 h-4 text-zinc-400 group-hover:text-white" />
+                    <ChevronDown className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white" />
                 </motion.div>
             </button>
 
@@ -76,7 +76,7 @@ export default function CustomSelect({
                         animate={{ opacity: 1, y: 8, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute z-[110] w-full mt-2 bg-[#0B1120] dark:bg-[#0B1120] border border-white/10 rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl overflow-hidden"
+                        className="absolute z-[110] w-full mt-2 bg-white dark:bg-[#0B1120] border border-zinc-200 dark:border-white/10 rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl overflow-hidden"
                     >
                         <div className="max-h-64 overflow-y-auto custom-scrollbar p-2">
                             {options.map((option) => (
@@ -87,8 +87,8 @@ export default function CustomSelect({
                                         setIsOpen(false)
                                     }}
                                     className={`w-full flex items-center justify-between px-5 py-4 rounded-xl transition-all duration-200 group/item mb-1 last:mb-0 ${value === option
-                                            ? 'bg-blue-500/10 text-blue-400'
-                                            : 'hover:bg-white/5 text-zinc-400 hover:text-white'
+                                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                        : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                 >
                                     <span className="text-sm font-semibold tracking-wide text-left">
@@ -110,6 +110,6 @@ export default function CustomSelect({
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     )
 }

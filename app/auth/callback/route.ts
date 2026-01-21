@@ -40,7 +40,6 @@ export async function GET(request: Request) {
 
             if (!error && data?.session) {
                 let finalNext = next
-                // If the next destination is update-password, we should signify that it's a recovery flow
                 if (next === '/update-password') {
                     finalNext = '/update-password?type=recovery'
                 }
@@ -55,7 +54,20 @@ export async function GET(request: Request) {
             console.error('Exception during code exchange:', err)
         }
     } else {
-        console.log('No code parameter found in URL')
+        console.log('No code parameter found, checking for existing session...')
+        const supabase = await createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+            console.log('Existing session found, redirecting to:', next)
+            let finalNext = next
+            if (next === '/update-password') {
+                finalNext = '/update-password?type=recovery'
+            }
+            console.log('===================================')
+            return NextResponse.redirect(`${origin}${finalNext}`)
+        }
+        console.log('No code and no session found.')
     }
 
     // return the user to an error page with instructions

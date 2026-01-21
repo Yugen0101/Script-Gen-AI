@@ -84,8 +84,8 @@ export default function Header() {
                         <Logo className="w-9 h-9 sm:w-11 sm:h-11" />
                         <div className="absolute -inset-1 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <span className="text-xl sm:text-2xl font-black tracking-tight text-white/95">
-                        Script <span className="text-blue-400">GO</span>
+                    <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white/95">
+                        Script <span className="text-blue-600 dark:text-blue-400">GO</span>
                     </span>
                 </button>
 
@@ -126,12 +126,12 @@ export default function Header() {
                         <div className="relative account-dropdown">
                             <button
                                 onClick={() => setShowMenu(!showMenu)}
-                                className="group flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/5 hover:border-white/10 bg-white/5 hover:bg-white/[0.08] transition-all duration-300 active:scale-95"
+                                className="group flex items-center gap-2.5 px-4 py-2 rounded-full border border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/[0.08] transition-all duration-300 active:scale-95"
                             >
-                                <div className="p-1 rounded-full bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
+                                <div className="p-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
                                     <User className="w-4 h-4" />
                                 </div>
-                                <span className="hidden sm:inline font-bold text-[13px] tracking-wide text-zinc-300 group-hover:text-white uppercase">
+                                <span className="hidden sm:inline font-bold text-[13px] tracking-wide text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white uppercase">
                                     {user.user_metadata?.username || user.email?.split('@')[0] || 'Account'}
                                 </span>
                             </button>
@@ -167,7 +167,7 @@ export default function Header() {
                     ) : (
                         // Logged Out State - "Liquid Solid" Premium Controls
                         <div className="flex items-center gap-4">
-                            <button className="px-5 py-2.5 text-[13px] font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-all duration-300"
+                            <button className="px-5 py-2.5 text-[13px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white uppercase tracking-widest transition-all duration-300"
                                 onClick={() => router.push('/login')}
                             >
                                 Login

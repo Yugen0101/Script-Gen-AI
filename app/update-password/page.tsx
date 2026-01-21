@@ -20,39 +20,60 @@ function UpdatePasswordContent() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userEmail, setUserEmail] = useState<string | null>(null)
     const [isRecovery, setIsRecovery] = useState(false)
+    const [isVerifying, setIsVerifying] = useState(false)
 
     useEffect(() => {
         setMounted(true)
+
         const checkSession = async () => {
-            // First, check if there's a recovery token in the URL hash
             const hash = window.location.hash
             const typeParam = searchParams.get('type')
+            const isRecoveryFlow = (hash && (hash.includes('type=recovery') || hash.includes('access_token'))) || typeParam === 'recovery'
 
-            // If there's an access_token in the hash, Supabase will automatically exchange it
-            if (hash && hash.includes('access_token')) {
-                // Wait a moment for Supabase to process the token
-                await new Promise(resolve => setTimeout(resolve, 100))
-            }
-
-            const { data: { session } } = await supabase.auth.getSession()
-            setIsLoggedIn(!!session)
-            setUserEmail(session?.user?.email || null)
-
-            // Check if this is a recovery flow
-            if (
-                (hash && (hash.includes('type=recovery') || hash.includes('access_token'))) ||
-                typeParam === 'recovery'
-            ) {
+            if (isRecoveryFlow) {
                 setIsRecovery(true)
+                setIsVerifying(true)
             }
 
-            // If still no session and we have a hash, show error
-            if (!session && hash && hash.includes('access_token')) {
-                setError('Auth session missing! Please try requesting a new password reset link.')
+            // Check for initial session
+            const { data: { session: initialSession } } = await supabase.auth.getSession()
+            if (initialSession) {
+                setIsLoggedIn(true)
+                setUserEmail(initialSession.user?.email || null)
+                setIsVerifying(false)
+                return
+            }
+
+            // If no session but it looks like a recovery flow, wait for it
+            if (isRecoveryFlow) {
+                const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
+                    console.log('Auth event on password reset page:', event, !!session)
+                    if (session) {
+                        setIsLoggedIn(true)
+                        setUserEmail(session.user?.email || null)
+                        setIsVerifying(false)
+                        setError(null)
+                    }
+                })
+
+                // Safety timeout: If no session after 3 seconds, show error
+                const timer = setTimeout(() => {
+                    if (!isLoggedIn) {
+                        setIsVerifying(false)
+                        setError('Auth session missing! Please try requesting a new password reset link.')
+                    }
+                    subscription.unsubscribe()
+                }, 3000)
+
+                return () => {
+                    clearTimeout(timer)
+                    subscription.unsubscribe()
+                }
             }
         }
+
         checkSession()
-    }, [supabase.auth, searchParams])
+    }, [supabase.auth, searchParams, isLoggedIn])
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -125,6 +146,13 @@ function UpdatePasswordContent() {
                             <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 text-red-600 dark:text-red-400 text-sm">
                                 <AlertCircle className="w-5 h-5 shrink-0" />
                                 <p>{error}</p>
+                            </div>
+                        )}
+
+                        {isVerifying && (
+                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3 text-blue-600 dark:text-blue-400 text-sm">
+                                <Loader2 className="w-5 h-5 animate-spin shrink-0" />
+                                <p>Verifying recovery session...</p>
                             </div>
                         )}
 

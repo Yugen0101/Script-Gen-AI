@@ -58,8 +58,7 @@ function LoginContent() {
                 })
                 if (error) throw error
 
-                router.refresh()
-                router.push('/dashboard')
+                window.location.href = '/dashboard'
             } else {
                 const { data, error } = await supabase.auth.signUp({
                     email,
@@ -76,8 +75,7 @@ function LoginContent() {
 
                 if (data?.session) {
                     // Auto-confirmation worked - redirect to dashboard
-                    router.refresh()
-                    router.push('/dashboard')
+                    window.location.href = '/dashboard'
                 } else if (data?.user) {
                     // Verification email sent
                     setSuccessMessage('Please check your email to confirm your account and start generating scripts.')
@@ -101,14 +99,15 @@ function LoginContent() {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${location.origin}/auth/callback?next=/update-password`,
+                redirectTo: `${window.location.origin}/update-password`,
             })
 
             if (error) throw error
 
             setSuccessMessage('Password reset link sent! Please check your email.')
         } catch (err: any) {
-            setError(err.message)
+            console.error('Detailed Forgot Password Error:', err)
+            setError(err.message || 'An unexpected error occurred. Please try again.')
         } finally {
             setLoading(false)
         }

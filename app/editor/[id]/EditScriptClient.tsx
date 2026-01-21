@@ -431,7 +431,7 @@ export default function EditScriptClient({ script }: { script: Script }) {
                         animate={{ opacity: 1, x: 0 }}
                         className="lg:col-span-1"
                     >
-                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/50 dark:shadow-none text-zinc-900 dark:text-white">
+                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/40 dark:shadow-none text-zinc-900 dark:text-white">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-zinc-900 dark:text-white">
                                 <Logo className="w-6 h-6" />
                                 Script Settings
@@ -475,7 +475,7 @@ export default function EditScriptClient({ script }: { script: Script }) {
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center gap-2">
                                                                 <CalendarIcon className="w-4 h-4 text-blue-400" />
-                                                                <span className="text-sm font-medium text-zinc-300">Plan Duration</span>
+                                                                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Plan Duration</span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
                                                                 <input
@@ -796,7 +796,7 @@ export default function EditScriptClient({ script }: { script: Script }) {
                                         exit={{ opacity: 0 }}
                                         className="h-full flex flex-col"
                                     >
-                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-zinc-50/50 dark:bg-[#0B1120]/50 backdrop-blur-sm">
+                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-zinc-50 dark:bg-[#0B1120]/50 backdrop-blur-sm">
                                             <h3 className="font-semibold text-zinc-900 dark:text-white">Script Content</h3>
                                             <div className="flex gap-2">
 

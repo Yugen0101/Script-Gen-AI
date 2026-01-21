@@ -273,7 +273,7 @@ export default function EditorPage() {
                         animate={{ opacity: 1, x: 0 }}
                         className="lg:col-span-1"
                     >
-                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/50 dark:shadow-none bg-white/50 dark:bg-black/20 text-zinc-900 dark:text-white">
+                        <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-6 sticky top-24 border border-zinc-200 dark:border-white/5 shadow-xl shadow-zinc-200/40 dark:shadow-none text-zinc-900 dark:text-white">
                             <div className="flex items-center gap-3 mb-6">
                                 <button onClick={() => router.back()} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white smooth-transition">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -322,7 +322,7 @@ export default function EditorPage() {
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center gap-2">
                                                                 <CalendarIcon className="w-4 h-4 text-blue-400" />
-                                                                <span className="text-sm font-medium text-zinc-300">Plan Duration</span>
+                                                                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Plan Duration</span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
                                                                 <input
@@ -600,7 +600,7 @@ export default function EditorPage() {
                                                     {loadingMessages[loadingMessageIndex]}
                                                 </motion.p>
                                             </AnimatePresence>
-                                            <p className="text-sm text-muted-foreground animate-pulse">Our AI is putting on its creative hat...</p>
+                                            <p className="text-sm text-zinc-500 dark:text-muted-foreground animate-pulse">Our AI is putting on its creative hat...</p>
                                         </div>
                                     </motion.div>
                                 ) : content ? (
@@ -611,7 +611,7 @@ export default function EditorPage() {
                                         exit={{ opacity: 0 }}
                                         className="h-full flex flex-col"
                                     >
-                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center bg-zinc-50/50 dark:bg-[#0B1120]/50 backdrop-blur-sm sticky top-0 z-20 gap-4">
+                                        <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex flex-col sm:flex-row justify-row justify-between items-center bg-zinc-50 dark:bg-[#0B1120]/50 backdrop-blur-sm sticky top-0 z-20 gap-4">
                                             <div className="flex items-center gap-4 w-full sm:w-auto">
                                                 <div>
                                                     <h3 className="font-semibold text-zinc-900 dark:text-white leading-tight">{title || 'Generated Content'}</h3>
@@ -676,7 +676,7 @@ export default function EditorPage() {
                                                 <textarea
                                                     value={content}
                                                     onChange={(e) => setContent(e.target.value)}
-                                                    className="w-full h-full min-h-[500px] bg-transparent border-none focus:outline-none resize-none font-mono text-sm leading-relaxed text-zinc-800 dark:text-zinc-300"
+                                                    className="w-full h-full min-h-[500px] bg-transparent border-none focus:outline-none resize-none font-mono text-sm leading-relaxed text-zinc-800 dark:text-zinc-200"
                                                     placeholder="Your generated script will appear here..."
                                                 />
                                             )}

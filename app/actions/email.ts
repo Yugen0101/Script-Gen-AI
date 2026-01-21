@@ -50,7 +50,7 @@ export async function sendScriptReadyEmail(email: string, title: string, preview
     }
 }
 
-export async function sendPasswordResetEmail(email: string) {
+export async function sendPasswordResetEmail(email: string, origin?: string) {
     const supabaseAdmin = process.env.SUPABASE_SERVICE_ROLE_KEY
         ? createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -64,19 +64,25 @@ export async function sendPasswordResetEmail(email: string) {
     }
 
     try {
+        console.log('Generating reset link for:', email)
         const { data, error } = await supabaseAdmin.auth.admin.generateLink({
             type: 'recovery',
             email,
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/update-password`,
+                redirectTo: `${origin || process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/update-password`,
             },
         })
 
-        if (error) throw error
+        if (error) {
+            console.error('Supabase generateLink error:', error)
+            throw error
+        }
 
         const { properties } = data
         const resetLink = properties.action_link
+        console.log('Reset link generated successfully')
 
+        console.log('Sending email via Resend to:', email)
         const { data: emailData, error: emailError } = await resend.emails.send({
             from: 'Script GO <onboarding@resend.dev>',
             to: [email],
@@ -85,13 +91,14 @@ export async function sendPasswordResetEmail(email: string) {
         })
 
         if (emailError) {
-            console.error('Email sending error:', emailError)
+            console.error('Resend email sending error:', emailError)
             throw emailError
         }
 
+        console.log('Email sent successfully via Resend:', emailData)
         return { success: true }
     } catch (error: any) {
-        console.error('Error sending password reset email:', error)
+        console.error('Detailed error sending password reset email:', error)
         return { success: false, error: error.message || 'Unknown error' }
     }
 }
