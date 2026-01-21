@@ -84,8 +84,8 @@ export default function Header() {
                         <Logo className="w-9 h-9 sm:w-11 sm:h-11" />
                         <div className="absolute -inset-1 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white/95">
-                        Script <span className="text-blue-600 dark:text-blue-400">GO</span>
+                    <span suppressHydrationWarning className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white/95">
+                        Script <span suppressHydrationWarning className="text-blue-600 dark:text-blue-400">GO</span>
                     </span>
                 </button>
 
@@ -167,7 +167,7 @@ export default function Header() {
                     ) : (
                         // Logged Out State - "Liquid Solid" Premium Controls
                         <div className="flex items-center gap-4">
-                            <button className="px-5 py-2.5 text-[13px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white uppercase tracking-widest transition-all duration-300"
+                            <button suppressHydrationWarning className="px-5 py-2.5 text-[13px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white uppercase tracking-widest transition-all duration-300"
                                 onClick={() => router.push('/login')}
                             >
                                 Login
