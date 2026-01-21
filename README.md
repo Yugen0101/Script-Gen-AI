@@ -42,7 +42,7 @@ GEMINI_API_KEY=your_gemini_api_key
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000)
+5. Open [http://localhost:3001](http://localhost:3001)
 
 ## Deployment
 
