@@ -97,16 +97,32 @@ export default function EditScriptClient({ script }: { script: Script }) {
 
 
     const [scriptData, setScriptData] = useState<any>(() => {
+        // If content is already an object
         if (typeof script.content === 'object' && script.content !== null) {
-            return script.content
+            console.log('📦 Content is already an object:', script.content);
+            return script.content;
         }
-        try {
-            const clean = (script.content || '').replace(/```json/g, '').replace(/```/g, '').trim()
-            if (clean.startsWith('{')) {
-                return JSON.parse(clean)
+
+        // If content is a string, try to parse it
+        if (typeof script.content === 'string') {
+            try {
+                // Remove markdown code blocks if present
+                let clean = script.content.replace(/```json/g, '').replace(/```/g, '').trim();
+
+                // Try to parse
+                if (clean.startsWith('{') || clean.startsWith('[')) {
+                    const parsed = JSON.parse(clean);
+                    console.log('📦 Parsed content from string:', parsed);
+                    return parsed;
+                }
+            } catch (e) {
+                console.error('❌ Failed to parse script content:', e);
+                console.log('Raw content:', script.content);
             }
-        } catch (e) { }
-        return null
+        }
+
+        console.warn('⚠️ No valid script data found');
+        return null;
     })
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -152,6 +168,17 @@ export default function EditScriptClient({ script }: { script: Script }) {
             setLoadingMessageIndex(0)
         }
     }, [loading])
+
+    // Debug script data on mount
+    useEffect(() => {
+        console.log('🔍 Script Debug Info:');
+        console.log('- script.content type:', typeof script.content);
+        console.log('- script.content:', script.content);
+        console.log('- scriptData:', scriptData);
+        console.log('- isCalendarMode:', isCalendarMode);
+        console.log('- scriptData?.isBundle:', scriptData?.isBundle);
+        console.log('- scriptData?.scripts length:', scriptData?.scripts?.length);
+    }, [])
 
     const tones = ['Professional', 'Casual', 'Creative', 'Funny', 'Educational', 'Viral/High Energy', 'Controversial']
 

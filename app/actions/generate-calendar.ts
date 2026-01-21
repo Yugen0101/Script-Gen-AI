@@ -42,15 +42,21 @@ export async function generateCalendarContent({ platform, topic, tone, language,
 
     try {
         // Step 1: Generate a list of titles/topics for the selected duration
-        const planInstructions = `You are a content strategist for ${platform}. Your task is to generate a content plan for ${days} consecutive days.
+        const planInstructions = `You are a content strategist for ${platform}. Your task is to generate a content plan for EXACTLY ${days} consecutive days.
+
+        CRITICAL REQUIREMENT: You MUST generate EXACTLY ${days} items in the plan array. No more, no less.
+
         Main Topic: ${topic}
         Tone: ${tone}
         Language: ${language}
 
-        Return a valid JSON object with a "plan" array. Each item in the array should have:
-        - "day": The day number (1 to ${days})
+        Return a valid JSON object with a "plan" array containing EXACTLY ${days} items.
+        Each item in the array MUST have:
+        - "day": The day number (1, 2, 3, ... up to ${days})
         - "title": A catchy title for the content that day.
         - "brief": A short brief or specific angle for that day's content.
+
+        VERIFICATION: Before returning, count the items in your plan array. It MUST equal ${days}.
 
         Ensure the content is diverse but stays on the main topic.
         Output ONLY valid JSON.`;
@@ -67,6 +73,32 @@ export async function generateCalendarContent({ platform, topic, tone, language,
 
         const planData = JSON.parse(planRaw);
         const plan = planData.plan || [];
+
+        // Validate that we have the correct number of days
+        if (plan.length !== days) {
+            console.warn(`⚠️ AI generated ${plan.length} days instead of ${days}. Adjusting...`);
+
+            // If too few, pad with generic days
+            while (plan.length < days) {
+                plan.push({
+                    day: plan.length + 1,
+                    title: `${topic} - Day ${plan.length + 1}`,
+                    brief: `Continue exploring ${topic} with fresh insights and perspectives`
+                });
+            }
+
+            // If too many, trim
+            if (plan.length > days) {
+                plan.splice(days);
+            }
+        }
+
+        // Ensure day numbers are sequential
+        plan.forEach((item: any, index: number) => {
+            item.day = index + 1;
+        });
+
+        console.log(`✅ Validated plan: ${plan.length} days (requested: ${days})`);
 
         if (plan.length === 0) {
             return { success: false, error: 'Failed to generate content plan.' };
