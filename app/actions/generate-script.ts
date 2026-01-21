@@ -148,13 +148,14 @@ Input Parameters:
 
 CRITICAL LANGUAGE REQUIREMENT:
 1. If the target language is English, the entire script must be in English.
-2. If the target language is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST provide a script that is **EASY TO SPEAK** and **HUMAN UNDERSTANDABLE**. 
-   - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) for the core structure and simple, everyday dialogue.
-   - **ENGLISH FOR COMPLEXITY (TANGLISH/KANGLISH style)**: For ANY word that is complex, formal, or has a specific technical meaning, **DO NOT** use the formal native word. Instead, use the **ENGLISH** word (written in English script). 
-   - **REQUIRED**: This hybrid approach (e.g., Tanglish for Tamil, Hinglish for Hindi) is MANDATORY to ensure the script sounds natural and modern, like how people actually talk on social media.
+2. If the target language is NOT English (e.g., Tamil, Hindi, Malayalam, Kannada, Spanish), you MUST generate a script that is **HYPER-CONVERSATIONAL**, **EASY TO SPEAK**, and **MODERN**.
+   - **THE "TALK TEST"**: If a sentence sounds like a textbook or a news anchor, it is WRONG. It must sound like a Reel creator or a YouTuber.
+   - **NATIVE SCRIPT FOUNDATION**: Use the native script (e.g., தமிழ், हिंदी) only for simple, everyday connectors and core sentence structure.
+   - **MANDATORY ENGLISH (TANGLISH/KANGLISH style)**: For ANY word that is technical, formal, professional, or complex, **YOU MUST** use the **ENGLISH** word (written in English script). 
+   - **NO FORMAL WORDS**: Never use formal "dictionary" native words (e.g., instead of the formal Tamil word for "Technology", use "Technology").
+   - **EASY TO PRONOUNCE**: If a native word has more than 3-4 syllables or is hard to pronounce, replace it with a simpler English equivalent.
    - **EVERYTHING INSIDE JSON**: This applies to Hooks, Visual Directions, Audio, and Captions.
-   - **HUMAN TOUCH**: Write like a friend speaking to a friend. If a sentence feels too formal in the native script, rewrite it to be casual, even if it means using more English words.
-   - **OUTPUT STYLE**: Focus on "speaking" rather than "reading". If a native word is hard to pronounce or sounds outdated, replace it with the English equivalent.
+   - **GOAL**: The creator should be able to read this script without a single stumble. It should feel like they are talking to a close friend.
 
 FACTUAL ACCURACY MANDATE:
 - You are a professional researcher. Ensure all information provided is 100% accurate. 

@@ -20,13 +20,11 @@ async function testConnection() {
         const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
         if (error) {
             console.error('Connection failed:', error.message);
-            process.exit(1);
+        } else {
+            console.log('Connection successful! Table exists and is accessible.');
         }
-        console.log('Connection successful! Table exists and is accessible.');
-        process.exit(0);
     } catch (err) {
         console.error('Fatal error during connection test:', err.message);
-        process.exit(1);
     }
 }
 

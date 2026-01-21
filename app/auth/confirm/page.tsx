@@ -4,9 +4,10 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { motion } from 'framer-motion'
-import { ShieldCheck, ArrowRight } from 'lucide-react'
+import { ShieldCheck, ArrowRight, Loader2 } from 'lucide-react'
+import { Suspense } from 'react'
 
-export default function ConfirmPage() {
+function ConfirmPageContent() {
     const searchParams = useSearchParams()
 
     // Construct the callback URL manually to preserve all params
@@ -42,5 +43,17 @@ export default function ConfirmPage() {
                 </Link>
             </motion.div>
         </div>
+    )
+}
+
+export default function ConfirmPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#0B1120]">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            </div>
+        }>
+            <ConfirmPageContent />
+        </Suspense>
     )
 }

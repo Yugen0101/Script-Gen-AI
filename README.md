@@ -46,7 +46,12 @@ npm run dev
 
 ## Deployment
 
-This app is configured for Netlify deployment. Make sure to set the environment variables in your Netlify dashboard.
+For detailed instructions on how to deploy this application manually, please refer to:
+
+- 📑 [Manual Deployment Guide](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/DEPLOYMENT.md) - Step-by-step instructions for Vercel, Netlify, and Self-hosting.
+- ✅ [Pre-Deployment Checklist](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/DEPLOYMENT_CHECKLIST.md) - Ensuring everything is ready before you go live.
+
+This app is configured for Netlify deployment by default via `netlify.toml`. Make sure to set all required environment variables (see [.env.example](file:///c:/Users/YUGEN/Downloads/Script-Gen-AI/.env.example)) in your hosting dashboard.
 
 ## License
 
