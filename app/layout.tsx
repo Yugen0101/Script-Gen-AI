@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.className} min-h-screen smooth-transition`}>
+            <body className={`${inter.className} min-h-screen smooth-transition`} suppressHydrationWarning>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"

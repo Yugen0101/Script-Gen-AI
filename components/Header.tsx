@@ -140,23 +140,23 @@ export default function Header() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    className="absolute right-0 mt-5 w-52 bg-[#0B1120] border border-zinc-200/10 dark:border-white/10 rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl overflow-hidden z-[100]"
+                                    className="absolute right-0 mt-5 w-52 bg-white dark:bg-[#0B1120] border border-zinc-200/20 dark:border-white/10 rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl overflow-hidden z-[100]"
                                 >
                                     <button
                                         onClick={() => router.push('/update-password')}
-                                        className="w-full px-5 py-3.5 flex items-center gap-2.5 hover:bg-white/5 transition-all text-left text-[13px] font-bold text-zinc-300 hover:text-white uppercase tracking-wider group/item"
+                                        className="w-full px-5 py-3.5 flex items-center gap-2.5 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all text-left text-[13px] font-bold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white uppercase tracking-wider group/item"
                                     >
-                                        <div className="p-1 rounded-md bg-blue-500/10 text-blue-400 group-hover/item:scale-110 transition-transform">
+                                        <div className="p-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover/item:scale-110 transition-transform">
                                             <Key className="w-3.5 h-3.5" />
                                         </div>
                                         <span>Change Password</span>
                                     </button>
 
-                                    <div className="h-[1px] bg-white/5 mx-4" />
+                                    <div className="h-[1px] bg-zinc-200/50 dark:bg-white/5 mx-4" />
 
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full px-5 py-3.5 flex items-center gap-2.5 hover:bg-red-500/5 transition-all text-left text-[13px] font-bold text-red-400/80 hover:text-red-400 uppercase tracking-wider"
+                                        className="w-full px-5 py-3.5 flex items-center gap-2.5 hover:bg-red-500/5 transition-all text-left text-[13px] font-bold text-red-500 dark:text-red-400/80 hover:text-red-600 dark:hover:text-red-400 uppercase tracking-wider"
                                     >
                                         <LogOut className="w-4 h-4" />
                                         <span>Logout</span>
