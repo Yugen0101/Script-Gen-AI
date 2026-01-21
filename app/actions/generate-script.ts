@@ -179,9 +179,12 @@ ENSURE THE OUTPUT IS PURE VALID JSON ONLY. NO MARKDOWN BLOCK.`;
 
         // Send email in the background after response is sent (Next.js 15+)
         after(async () => {
+            console.log('🔄 background after() process started for email');
             try {
                 const supabase = await createClient()
+                console.log('🔄 Supabase client created in background');
                 const { data: { user } } = await supabase.auth.getUser()
+                console.log('🔄 Auth getUser result:', user?.email ? `User found: ${user.email}` : 'No user found');
 
                 if (user && user.email) {
                     let preview = "Your script is ready! Check your dashboard to view and edit it.";
@@ -194,17 +197,17 @@ ENSURE THE OUTPUT IS PURE VALID JSON ONLY. NO MARKDOWN BLOCK.`;
                         }
                         if (jsonContent.title) title = jsonContent.title;
                     } catch (e) {
-                        console.log('Could not parse script content for email preview, using fallback');
+                        console.log('⚠️ Could not parse script content for email preview, using fallback');
                     }
 
                     console.log('📧 Sending script ready email to:', user.email);
                     const result = await sendScriptReadyEmail(user.email, title, preview, 'generated');
                     console.log('📧 Email send result:', result);
                 } else {
-                    console.log('⚠️ No user or email found, skipping script ready email');
+                    console.log('⚠️ No user or email found in background after() block, skipping script ready email');
                 }
             } catch (emailError) {
-                console.error("❌ Failed to send script ready email:", emailError)
+                console.error("❌ Failed to send script ready email in background:", emailError)
             }
         })
 

@@ -8,10 +8,12 @@ import { createClient } from '@supabase/supabase-js'
 
 // Client initialized lazily to prevent build-time errors
 
+const FROM_EMAIL = 'Script GO <onboarding@resend.dev>';
+
 export async function sendWelcomeEmail(email: string, name: string = 'User') {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'ScriptGo <onboarding@resend.dev>', // Update this if you have a custom domain
+            from: FROM_EMAIL,
             to: [email],
             subject: 'Welcome to ScriptGo!',
             react: WelcomeEmail({ name }),
@@ -30,9 +32,10 @@ export async function sendWelcomeEmail(email: string, name: string = 'User') {
 }
 
 export async function sendScriptReadyEmail(email: string, title: string, previewContent: string, scriptId: string) {
+    console.log(`📧 Attempting to send script ready email to ${email} for "${title}"`);
     try {
         const { data, error } = await resend.emails.send({
-            from: 'ScriptGo <notifications@resend.dev>', // Update this if you have a custom domain
+            from: FROM_EMAIL,
             to: [email],
             subject: `Your script "${title}" is ready!`,
             react: ScriptReadyEmail({ title, previewContent, scriptId }),
@@ -84,7 +87,7 @@ export async function sendPasswordResetEmail(email: string, origin?: string) {
 
         console.log('Sending email via Resend to:', email)
         const { data: emailData, error: emailError } = await resend.emails.send({
-            from: 'Script GO <onboarding@resend.dev>',
+            from: FROM_EMAIL,
             to: [email],
             subject: 'Reset your Script GO password',
             react: ResetPasswordEmail({ resetLink }),
