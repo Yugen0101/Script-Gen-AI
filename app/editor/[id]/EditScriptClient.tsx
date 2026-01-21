@@ -848,11 +848,8 @@ export default function EditScriptClient({ script }: { script: Script }) {
                                             {scriptData?.isBundle ? (
                                                 <div className="h-full">
                                                     <CalendarView
-                                                        scripts={(scriptData.scripts || []).map((s: any) => ({
-                                                            ...s,
-                                                            platform: s.platform || script.platform
-                                                        }))}
-                                                        days={scriptData.scripts.length}
+                                                        scripts={getCalendarScripts()}
+                                                        days={scriptData.scripts?.length || duration}
                                                         startDate={scheduledDate}
                                                         onCompleted={handleCompleted}
                                                         onReset={handleNotCompleted}
