@@ -99,7 +99,7 @@ function LoginContent() {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/update-password`,
+                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback?next=/update-password`,
             })
 
             if (error) throw error
